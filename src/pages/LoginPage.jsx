@@ -1,16 +1,33 @@
+import axios from "axios";
 import { useState } from "react";
 import { Card, Button, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, serError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async(e) => {
     e.preventDefault();
-    if (email == "admin@gmail.com" && password == "123") {
-      alert("Login Success");
-    } else {
-      alert("Login Failed");
+    serError("");
+    try {
+      const response = await axios.post("http://localhost:8000/api/login", {
+        email,
+        password,
+      });
+
+      if(response.status == 200){
+        localStorage.setItem('token', response.data.token);
+        navigate('/user');
+      }
+      alert('Login Berhasil')
+      
+    } catch (error) {
+      serError(error.response.data.message || 'Login Gagal');
+      console.log(error.error);
+      alert('Login Error');
     }
   };
 
